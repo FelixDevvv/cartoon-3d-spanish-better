@@ -1,33 +1,37 @@
 # Claude Animated Shorts
 
-The free Claude skill from the video **"How to Make Viral Animated Shorts Using Claude (Full Workflow)"**.
+La skill gratuita de Claude del vídeo **"How to Make Viral Animated Shorts Using Claude (Full Workflow)"**.
 
-It makes 55-70 s vertical animated story shorts: 2D characters in a colourful 3D world, with ink outlines, a painted town, lens blur, gliding cameras, a march score and sound effects. Everything is rendered with three.js inside Remotion on your own PC, with no AI video generator.
+Crea cortos animados verticales de historia de 55-70 s: personajes 2D en un mundo 3D colorido, con contornos de tinta, un pueblo pintado, desenfoque de lente, cámaras deslizantes, una partitura de marcha y efectos de sonido. Todo se renderiza con three.js dentro de Remotion en tu propio PC, sin generador de vídeo con IA.
 
-Proven on **The Bridge That Fell for a Song**, a 67 s short about the 1831 Broughton bridge.
+Probado en **The Bridge That Fell for a Song**, un corto de 67 s sobre el puente de Broughton de 1831.
 
-## What's inside
-| Path | What it is |
+## Qué contiene
+
+| Ruta | Qué es |
 |---|---|
-| `SKILL.md` | The skill: the full pipeline, every rule, every fix, and the final look values |
-| `templates/bridge/` | The full source of the bridge short: world, characters, ink, lens blur, grade, story/camera |
-| `templates/audio/` | The synthesized sound: SFX, march music, the mix with ducking and loudness |
-| `templates/scripts/` | Stills, side-by-side sheets, shot merge and frame-by-frame QA helpers |
-| `references/STYLE_BIBLE.md` | The script and visual formula measured from 20 reference shorts |
-| `references/reports/` | Seven measured reports: motion, depth, textures, characters, lighting, outlines, grade |
-| `references/frames/` | 38 full-size reference frames (540x960) to compare your frames against |
-| `references/sheets/` | 20 contact sheets, one per reference short, 60 frames each (1,200 frames) |
+| `SKILL.md` | La skill: el pipeline completo, cada regla, cada corrección y los valores finales del look |
+| `templates/bridge/` | El código fuente completo del corto del puente: mundo, personajes, tinta, desenfoque de lente, etalonaje, historia/cámara |
+| `templates/audio/` | El sonido sintetizado: SFX, música de marcha, la mezcla con ducking y sonoridad |
+| `templates/scripts/` | Stills, hojas comparativas lado a lado, fusión de tomas y ayudas de control de calidad fotograma a fotograma |
+| `references/STYLE_BIBLE.md` | La fórmula de guion y visual medida a partir de 20 cortos de referencia |
+| `references/reports/` | Siete informes medidos: movimiento, profundidad, texturas, personajes, iluminación, contornos, etalonaje |
+| `references/frames/` | 38 fotogramas de referencia a tamaño completo (540x960) para comparar con tus fotogramas |
+| `references/sheets/` | 20 hojas de contacto, una por corto de referencia, 60 fotogramas cada una (1.200 fotogramas) |
 
-## Install
-1. Copy this folder to `~/.claude/skills/cartoon-3d-short/` (clone it there, or download the ZIP).
-2. You need [Remotion](https://www.remotion.dev/) with `@remotion/three`, plus Node, Python 3 and ffmpeg.
-3. In Claude Code, say: *"Use the cartoon short skill and make a short about …"*.
+## Instalación
 
-Claude then follows `SKILL.md`: topic and facts, then script, then voice, then the shot plan in `story.ts`, then stills, then renders. Agents check your frames against the reports and the frames, and you get the final 2K render and sound mix.
+1. Copia esta carpeta a `~/.claude/skills/cartoon-3d-short/` (clónala ahí o descarga el ZIP).
+2. Necesitas [Remotion](https://www.remotion.dev/) con `@remotion/three`, además de Node, Python 3 y ffmpeg.
+3. En Claude Code, di: *"Use the cartoon short skill and make a short about …"*.
 
-## Notes
-- Set `REMOTION_TMP` to a folder on a big drive. Every Remotion bundle copies `public/` (~1.3 GB) into the temp folder.
-- Story, characters and voice should always be your own. Use the references for the look, not the content.
+Claude entonces sigue `SKILL.md`: tema y datos, luego guion, luego voz, luego el plan de planos en `story.ts`, luego stills, luego renders. Los agentes comparan tus fotogramas con los informes y los fotogramas, y obtienes el render final en 2K y la mezcla de sonido.
 
-## License
-The code and docs are MIT (see `LICENSE`). The reference frames are included for style study only.
+## Notas
+
+- Configura `REMOTION_TMP` a una carpeta en un disco grande. Cada bundle de Remotion copia `public/` (~1,3 GB) a la carpeta temporal.
+- La historia, los personajes y la voz siempre deben ser tuyos. Usa las referencias para el look, no para el contenido.
+
+## Licencia
+
+El código y la documentación son MIT (ver `LICENSE`). Los fotogramas de referencia se incluyen solo para estudio de estilo.
