@@ -2,7 +2,7 @@
 
 La skill gratuita de Claude del vídeo **"How to Make Viral Animated Shorts Using Claude (Full Workflow)"**.
 
-Crea cortos animados verticales de historia de 55-70 s: personajes 2D en un mundo 3D colorido, con contornos de tinta, un pueblo pintado, desenfoque de lente, cámaras deslizantes, una partitura de marcha y efectos de sonido. Todo se renderiza con three.js dentro de Remotion en tu propio PC, sin generador de vídeo con IA.
+Crea cortos animados verticales de historia de 55-70 s: personajes 3D estilizados en un mundo 3D colorido, con modo adicional de personajes Roblox 3D, con contornos de tinta, un pueblo pintado, desenfoque de lente, cámaras deslizantes, una partitura de marcha y efectos de sonido. Todo se renderiza con three.js dentro de Remotion en tu propio PC, sin generador de vídeo con IA.
 
 Probado en **The Bridge That Fell for a Song**, un corto de 67 s sobre el puente de Broughton de 1831.
 
@@ -12,7 +12,7 @@ Probado en **The Bridge That Fell for a Song**, un corto de 67 s sobre el puente
 |---|---|
 | `SKILL.md` | La skill: el pipeline completo, cada regla, cada corrección y los valores finales del look |
 | `templates/bridge/` | El código fuente completo del corto del puente: mundo, personajes, tinta, desenfoque de lente, etalonaje, historia/cámara |
-| `templates/audio/` | El sonido sintetizado: SFX, música de marcha, la mezcla con ducking y sonoridad |
+| `templates/audio/` | El sonido sintetizado: SFX, música con variaciones y contramelodías, mezcla con ducking y sonoridad |
 | `templates/scripts/` | Stills, hojas comparativas lado a lado, fusión de tomas y ayudas de control de calidad fotograma a fotograma |
 | `references/STYLE_BIBLE.md` | La fórmula de guion y visual medida a partir de 20 cortos de referencia |
 | `references/reports/` | Siete informes medidos: movimiento, profundidad, texturas, personajes, iluminación, contornos, etalonaje |
@@ -31,6 +31,8 @@ Claude entonces sigue `SKILL.md`: tema y datos, luego guion, luego voz, luego el
 
 - Configura `REMOTION_TMP` a una carpeta en un disco grande. Cada bundle de Remotion copia `public/` (~1,3 GB) a la carpeta temporal.
 - La historia, los personajes y la voz siempre deben ser tuyos. Usa las referencias para el look, no para el contenido.
+- Los personajes 3D reutilizables están en `templates/bridge/character3d.ts`: storybook 3D redondeado + una familia Roblox 3D independiente.
+- La música usa variaciones deterministas para evitar que todos los vídeos tengan la misma melodía o un loop repetido.
 
 ## Licencia
 
