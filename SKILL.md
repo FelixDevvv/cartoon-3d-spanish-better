@@ -1,6 +1,6 @@
 ---
 name: cartoon-3d-short
-description: Make a ~55-70 s vertical cartoon story short in the "2D characters in a colourful 3D world" style (flat bean-head cartoon cards with ink outlines, painted 3D town/world with black ink lines, saturated sky, depth-of-field backgrounds, gliding cameras, voice narration, synthesized SFX + march-style music), rendered with three.js inside Remotion. Proven on "The Bridge That Fell for a Song" (2026-10-31). Use when the user asks for another video "like the bridge video", "like the soldiers/bridge short", "in that cartoon 3D style", a history/science story short with cartoon characters in 3D, or says "use the cartoon short skill".
+description: Make a ~55-70 s vertical Spanish cartoon story short with polished 3D stylized characters in a colourful 3D world, plus a distinct Roblox-compatible 3D character mode, varied procedural music, voice, SFX and cinematic camera work. (flat bean-head cartoon cards with ink outlines, painted 3D town/world with black ink lines, saturated sky, depth-of-field backgrounds, gliding cameras, voice narration, synthesized SFX + march-style music), rendered with three.js inside Remotion. Proven on "The Bridge That Fell for a Song" (2026-10-31). Use when the user asks for another video "like the bridge video", "like the soldiers/bridge short", "in that cartoon 3D style", a history/science story short with cartoon characters in 3D, or says "use the cartoon short skill".
 ---
 
 # Cartoon 3D story short (three.js + Remotion)
@@ -10,15 +10,20 @@ Proven example: **The Bridge That Fell for a Song**. It is an original 67 s shor
 - Script, voice and sound: `~/bridge-short/`.
 - Style research: `references/`.
 
+The visual target is a polished, friendly, toy-like 3D cartoon look: rounded human proportions, expressive faces, clean materials, soft shadows and colourful environments. The uploaded user references are used only as visual guidance, not copied.
+
 The style reference is a channel studied privately (`references/`: STYLE_BIBLE.md, reports/*.md, frames/).
 - Those videos are private study material. Never upload, publish or send them.
 - Never copy their scripts, characters or shots. Story, characters and voice are always OUR OWN.
 - Never say the channel's name in a voice-over or description.
 
 User rules that apply:
-- No captions or labels in the video.
-- English only.
-- Voice: one steady tone.
+- Spanish by default; switch language only when the user explicitly asks.
+- No captions or labels in the video unless the user asks.
+- Voice: natural, clear and expressive; avoid robotic pacing.
+- Characters should be polished 3D meshes by default. Use the legacy 2D card system only when explicitly requested or when a shot benefits from it.
+- Never make every character identical: vary face, hair, clothing, proportions, accessories, pose and palette deterministically by seed.
+- Roblox mode is a separate blocky 3D character family; do not mix its proportions with the rounded storybook family unless requested.
 - Jokes are researched real facts.
 - Standard mix: music +3 dB, SFX -6 dB, voice unchanged.
 - Final export 2K vertical: 1440x2560, `--scale 1.3333`.
@@ -58,6 +63,10 @@ User rules that apply:
    - `paint.ts`: HD Canvas2D painted textures with seams painted in as dark tints.
    - `world.ts`: sky shader, fog = horizon colour, river, per-frame posing, sun frozen per shot and camera-relative.
 6. **Characters.**
+   - Default: use `templates/bridge/character3d.ts` for polished 3D storybook characters and its preset system.
+   - Storybook 3D: rounded head, readable eyes/mouth, soft bevels, toon materials, real scene lighting and contact shadows. Keep silhouettes simple enough to read on a phone.
+   - Roblox 3D: use `createRobloxCharacter()` / the Roblox presets for blocky bodies, square-ish heads and clean bevels. Keep this visually distinct from the storybook characters.
+   - Create at least 4 visually different characters in a normal story: protagonist, secondary character, adult/teacher, and one extra/background type. Reuse meshes/materials where possible for performance.
    - `toon.ts`: the Canvas2D `Pen` drawing API, 600x1000 design canvas, soles at y = 975, bean heads, stick limbs, plum variable-width outline, face library.
    - `cast.ts`: camera-facing billboards, crowds, effect cards, blinks, walk cycles. All billboards go on the `NOINK` layer.
    - `cardshade.ts`: cards lit by the scene light, no emissive.
@@ -66,6 +75,9 @@ User rules that apply:
    - Every pixel parameter scales with output height / 1920.
 8. **Sound** (`~/bridge-short/audio/`: timeline.py, sfx_gen.py, sfx.py, music.py, instruments.py, dsp.py, mix.py).
    - Event table → synthesized SFX plus an original score ducked under the voice.
+   - Music must not be a repeated 8-bar loop. Use `theme_variant()` and `counterline()` in `templates/audio/music.py` to alter contour, rhythm, register, timing, articulation and instrumentation between sections while preserving a recognizable musical identity.
+   - Give each major story beat a different musical texture when possible: hook, setup, escalation, reveal, consequence and ending.
+   - Use deterministic seeds so the same project renders reproducibly, but different videos can receive different musical variations.
    - Output: mix.wav (48 kHz, exact length), stems and cues.md.
    - Lock the picture's time constants before the sound is made. Any later timing change means re-running the sound.
 9. **Look checks.** Run `node scripts/bridge-stills.mjs out/<name>/x_ 100,400 0.5`.
@@ -164,3 +176,34 @@ lighting 5-6, ink 6, textures 5-6, characters 7, depth 6-7, composition 6-7 (fro
 - Golden rim light done as an offset outer copy turns every hat into a picture frame: inner rim only, head/torso only.
 - Balcony/railing rails at chest height through characters: put the lens ~2.5 m up so rails cross legs, not torsos.
 - Flat holds read as freezes in QA (frozen span ≥12 f): every hold needs a creeping push-in.
+
+## 3D character system
+
+Use `templates/bridge/character3d.ts` as the reusable character factory.
+
+### Storybook 3D
+- `createCartoon3DCharacter()` creates rounded, friendly human characters with bevelled geometry, toon materials, expressive faces, hair variants and accessories.
+- Presets: `child`, `teen`, `teacher`, `explorer`.
+- Available variation knobs include skin, hair, shirt, pants, shoes, hairstyle, body type, accessory, expression and seed.
+- Use real Three.js scene lights and shadows. Do not make the characters look like floating emissive cutouts.
+
+### Roblox 3D
+- `createRobloxCharacter()` creates a separate blocky character family with bevelled cubes, simple face geometry and Roblox-like proportions.
+- Presets: `robloxClassic`, `robloxBuilder`.
+- Add more Roblox presets when a story needs a different role: student, police, worker, gamer, scientist, etc.
+
+### Character quality checklist
+- Head and body proportions must remain appealing and readable at 1080x1920.
+- Eyes and mouth should remain visible in medium shots.
+- Avoid uncanny hyper-real skin, photoreal pores, excessive detail and generic AI-looking faces.
+- Use bevels, controlled roughness, soft key/fill/rim lighting and contact shadows.
+- Animate blinking, breathing, head turns, arm gestures and simple walk cycles; do not leave characters frozen for long holds.
+- Keep character creation deterministic from a seed.
+
+## Spanish video defaults
+
+- Script naturally in Spanish, not translated word-for-word from English.
+- Prefer short spoken sentences and concrete visual actions.
+- Voice timing drives shot timing through `words.json`.
+- Dialogue should be optional and brief; narration remains easy to understand.
+- For Shorts, target roughly 55-70 seconds unless the user requests another duration.
