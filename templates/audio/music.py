@@ -63,6 +63,53 @@ def theme(t_bar1, bars=range(1, 9), transpose=0, pickup=False, swing=False, late
         ev.append((t_bar1 + (b - 1) * 4 * Q + bb * Q + late, d * Q, m + transpose))
     return sorted(ev)
 
+# Variation engine: the same musical identity can return without becoming a copy.
+# Each variant changes contour, register, rhythm, articulation and/or call-response placement.
+# The seed is deterministic, so renders remain reproducible while different sections feel composed.
+def theme_variant(t_bar1, variant, bars=range(1, 9), transpose=0, pickup=False, swing=False, late=0.0):
+    base = theme(t_bar1, bars=bars, transpose=transpose, pickup=pickup, swing=swing, late=late)
+    rr = rng(7000 + variant * 97 + int(t_bar1 * 10))
+    out = []
+    for i, (t, d, m) in enumerate(base):
+        mode = variant % 6
+        if mode == 0:
+            out.append((t, d, m))
+        elif mode == 1:
+            lift = 12 if (i % 7 == 5) else (5 if i % 5 == 2 else 0)
+            out.append((t, d * (0.72 if i % 4 == 3 else 0.96), m + lift))
+        elif mode == 2:
+            if i % 6 not in (2, 5):
+                out.append((t, d, m))
+            if i % 8 == 7:
+                out.append((t + d * 0.72, min(Q * 0.32, d * 0.35), m + 7))
+        elif mode == 3:
+            shift = 0.045 if i % 3 == 1 else (-0.025 if i % 5 == 0 else 0.0)
+            out.append((t + shift, d * (0.62 if i % 3 == 0 else 0.9), m + (12 if i % 11 == 4 else 0)))
+        elif mode == 4:
+            phrase = i // 8
+            lift = 12 if phrase % 2 else 0
+            out.append((t, d, m + lift))
+            if i % 8 in (3, 7):
+                out.append((t + d * 0.65, min(0.18, d * 0.3), m + lift + 4))
+        else:
+            jitter = (rr.random() - 0.5) * 0.018
+            lift = 12 if i % 9 == 6 else 0
+            out.append((t + jitter, d * (0.8 + 0.12 * rr.random()), m + lift))
+    return sorted(out)
+
+def counterline(t0, bars, seed, register=0):
+    rr = rng(seed)
+    notes = []
+    scale = [0, 2, 3, 5, 7, 10]
+    for i in range(bars * 4):
+        if rr.random() < 0.22:
+            continue
+        beat = i * Q + (0.5 * Q if i % 2 else 0)
+        dur = Q * (0.35 if i % 3 else 0.6)
+        note = 53 + scale[int(rr.integers(len(scale)))] + register
+        notes.append((t0 + beat, dur, note))
+    return notes
+
 
 class Band:
     def __init__(self):
@@ -204,7 +251,7 @@ def build():
     # ============ STORY MARCH 4.5 - 21: band plays theme A (bars at odd seconds so "Then," = 33.0 is a downbeat)
     roll(b, 4.5, 4.96, 0.15, 0.5, accent=0.55, at=5.0)
     s0 = 5.0
-    a12 = theme(s0, bars=[1, 2])
+    a12 = theme_variant(s0, 1, bars=[1, 2])
     melody(b, "glock", a12, 0.36, 12, "glock", -0.35)
     melody(b, "fife", a12, 0.42, 0, "fife", 0.25)
     for bar in (1, 2):
@@ -212,7 +259,7 @@ def build():
         oompah(b, tb, CHB[bar], 0.5, False, 0.34)
         snare_bar(b, tb, "light", 0.36)
     b.cues.append((s0, "story: theme A1-A2 light (glock + fife, tuba on 1/3, horns on 2/4, light snare)"))
-    a38 = theme(s0, bars=range(3, 9))
+    a38 = theme_variant(s0, 2, bars=range(3, 9), transpose=0)
     melody(b, "glock", a38, 0.5, 12, "glock", -0.35)
     melody(b, "fife", a38, 0.58, 0, "fife", 0.25)
     b.add("cymbal", I.cymbal(0.42, _r()), 9.0, 0.0)
@@ -222,6 +269,8 @@ def build():
         snare_bar(b, tb, "march", 0.58, steps=range(16) if bar < 8 else range(12))
     roll(b, 20.5, 20.96, 0.25, 0.55, accent=0.6, at=21.0)
     b.cues.append((9.0, "full band: theme A3-A8 (cymbal), boots are the bass drum"))
+    counter = counterline(9.0, 6, 901, register=12)
+    melody(b, "vibes", counter, 0.16, 0, "vibes", 0.42, gate=0.7)
     b.cues.append((15.0, "tuba switches to bouncing octaves as the bridge starts bouncing"))
     # vamp: the band waits for the whistler
     oompah(b, 21.0, ["Bb"] * 4, 0.58, True, 0.38)
@@ -230,7 +279,7 @@ def build():
 
     # ============ WHISTLE 22.25 - 29.7: one soldier, then the column joins (23.75+), nervous falter at 29.2-29.7
     w0 = 23.0
-    wn = theme(w0, bars=[1, 2, 3], pickup=True) + [(29.0, 1.0, 84)]
+    wn = theme_variant(w0, 3, bars=[1, 2, 3], pickup=True) + [(29.0, 1.0, 84)]
     joins = [0.0] + list(np.linspace(23.75, 24.75, 8))
     falters = [29.42, 29.22, 29.3, 29.36, 29.25, 29.5, 29.33, 29.45, 29.28]
     chorus(b, "whistle", wn, 9, 22, joins=joins, falters=falters, spread=0.8, solo_gain=1.05)
@@ -308,7 +357,7 @@ def build():
     b.cues.append((53.62, "music-box run up 'higher and higher' into the march"))
 
     # ============ MARCH 2 54 - 57.5: golden, soft, the column whistles again
-    m2 = theme(54.0, bars=[1, 2])
+    m2 = theme_variant(54.0, 4, bars=[1, 2])
     m2 = [n for n in m2 if n[0] < 57.6]
     chorus(b, "whistle", m2, 6, 54, spread=0.7, vel=0.8, solo_gain=0.8)
     melody(b, "glock", m2, 0.32, 12, "glock", -0.35)
@@ -318,6 +367,8 @@ def build():
         oompah(b, tb, CHB[bar], 0.48, False, 0.32)
         snare_bar(b, tb, "light", 0.32, steps=range(16) if bar == 1 else range(12))
     b.cues.append((54.0, "march returns soft and golden, 6 whistlers, theme A1-A2"))
+    golden_answer = counterline(54.0, 2, 1704, register=19)
+    melody(b, "musicbox", golden_answer, 0.13, 0, "musicbox", 0.28)
 
     # ============ RULE 58.9 - 62: snare roll into brass stabs + timpani on the three hammer blows (I - V - I)
     roll(b, 58.85, 59.77, 0.12, 0.55)
@@ -332,7 +383,7 @@ def build():
     b.cues.append((T.HITS[0], "brass stab Bb + timpani on hammer blow 1 ('rule'), F on blow 2 ('Never'), Bb + cymbal on blow 3 ('step')"))
 
     # ============ TOURISTS 62 - 67.5: lazy swung version, vibes melody laid back, walking pizz bass, brushes
-    tn = theme(62.0, bars=[1, 2], swing=True, late=0.025)
+    tn = theme_variant(62.0, 5, bars=[1, 2], swing=True, late=0.025)
     tn += [(66.0 + 0.025, Q, 82), (66.5 + 0.025, Q / 2, 77), (66.5 + Q * 2 / 3 + 0.025, Q / 2, 74), (67.0 + 0.02, 0.5, 70)]
     melody(b, "vibes", tn, 0.6, 0, "vibes", -0.25)
     walk = [46, 50, 53, 50, 41, 45, 46, 48, 46, 41, 34]
@@ -349,6 +400,8 @@ def build():
         b.add("vibes", I.vibes(F(mm), 0.32, _r(), dur=0.6, damp=None, trem_depth=0.3), 67.0, 0.2)
     b.add("triangle", I.triangle(0.25, _r(), dur=0.5), 67.0, 0.3)
     b.cues.append((62.0, "relaxed tourist version: swung, laid-back vibes melody, walking pizzicato bass, brushes"))
+    tourist_counter = counterline(62.0, 5, 6205, register=-12)
+    melody(b, "pluck", tourist_counter, 0.12, 0, "pluck", -0.18)
     b.cues.append((67.0, "final Bb chord on 'tourists' (66.72-67.24), rings out, faded to silence at 67.5"))
     end = np.ones(N)
     a = ns(67.3)
